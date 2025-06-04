@@ -3,22 +3,17 @@ import database from "../firebase";
 import { ref, push, set, onValue, remove } from "firebase/database";
 
 export default function Admin() {
-  // Estado da aba atual
   const [activeTab, setActiveTab] = useState("adicionar");
-
-  // Estados do adicionar jogo
   const [data, setData] = useState("");
   const [placar, setPlacar] = useState("");
   const [gols, setGols] = useState("");
   const [saving, setSaving] = useState(false);
 
-  // Estados do apagar jogo
   const [jogos, setJogos] = useState({});
   const [selectedKey, setSelectedKey] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState("");
 
-  // Buscar jogos para apagar
   useEffect(() => {
     const jogosRef = ref(database, "jogos");
     const unsubscribe = onValue(
@@ -35,7 +30,6 @@ export default function Admin() {
     return () => unsubscribe();
   }, []);
 
-  // Função adicionar jogo
   const adicionarJogo = async () => {
     if (!data || !placar) {
       setMessage("Data e placar são obrigatórios.");
@@ -49,7 +43,6 @@ export default function Admin() {
       const jogosRef = ref(database, "jogos");
       const newJogoRef = push(jogosRef);
 
-      // Separar os nomes dos gols por vírgula, remover espaços extras
       const golsArray = gols
         .split(",")
         .map((g) => g.trim())
@@ -73,7 +66,6 @@ export default function Admin() {
     }
   };
 
-  // Função apagar jogo
   const apagarJogo = async () => {
     if (!selectedKey) {
       setMessage("Selecione uma partida para apagar.");
@@ -98,7 +90,10 @@ export default function Admin() {
     <div
       style={{
         maxWidth: 600,
+        width: "100%",
         margin: "40px auto",
+        padding: 16,
+        boxSizing: "border-box",
         fontFamily: "Arial, sans-serif",
       }}
     >
@@ -106,7 +101,6 @@ export default function Admin() {
         Admin - Pelada Artilharia
       </h1>
 
-      {/* Abas */}
       <div style={{ display: "flex", marginBottom: 24, cursor: "pointer" }}>
         <div
           onClick={() => {
@@ -146,23 +140,16 @@ export default function Admin() {
         </div>
       </div>
 
-      {/* Conteúdo das abas */}
       {activeTab === "adicionar" && (
         <div>
           <label style={{ display: "block", marginBottom: 6 }}>
-            Data do jogo (ex: 2025-06-04):
+            Data do jogo:
           </label>
           <input
             type="date"
             value={data}
             onChange={(e) => setData(e.target.value)}
-            style={{
-              width: "100%",
-              padding: 8,
-              marginBottom: 16,
-              borderRadius: 4,
-              border: "1px solid #ccc",
-            }}
+            style={inputStyle}
           />
 
           <label style={{ display: "block", marginBottom: 6 }}>
@@ -173,13 +160,7 @@ export default function Admin() {
             value={placar}
             onChange={(e) => setPlacar(e.target.value)}
             placeholder="Ex: 3x2"
-            style={{
-              width: "100%",
-              padding: 8,
-              marginBottom: 16,
-              borderRadius: 4,
-              border: "1px solid #ccc",
-            }}
+            style={inputStyle}
           />
 
           <label style={{ display: "block", marginBottom: 6 }}>
@@ -190,26 +171,15 @@ export default function Admin() {
             value={gols}
             onChange={(e) => setGols(e.target.value)}
             placeholder="Ex: João, Pedro, Maria"
-            style={{
-              width: "100%",
-              padding: 8,
-              marginBottom: 20,
-              borderRadius: 4,
-              border: "1px solid #ccc",
-            }}
+            style={inputStyle}
           />
 
           <button
             onClick={adicionarJogo}
             disabled={saving}
             style={{
-              width: "100%",
-              padding: 12,
+              ...buttonStyle,
               backgroundColor: saving ? "#93c5fd" : "#2563eb",
-              color: "white",
-              fontWeight: "700",
-              border: "none",
-              borderRadius: 6,
               cursor: saving ? "not-allowed" : "pointer",
             }}
           >
@@ -217,38 +187,19 @@ export default function Admin() {
           </button>
 
           {message && (
-            <p
-              style={{
-                marginTop: 16,
-                color: message.includes("sucesso") ? "green" : "red",
-                fontWeight: "600",
-                textAlign: "center",
-              }}
-            >
-              {message}
-            </p>
+            <p style={messageStyle(message)}>{message}</p>
           )}
         </div>
       )}
 
       {activeTab === "apagar" && (
         <div>
-          <label
-            htmlFor="jogo-select"
-            style={{ display: "block", marginBottom: 8 }}
-          >
+          <label htmlFor="jogo-select" style={{ display: "block", marginBottom: 8 }}>
             Selecione uma partida para apagar:
           </label>
           <select
             id="jogo-select"
-            style={{
-              width: "100%",
-              padding: 8,
-              marginBottom: 16,
-              borderRadius: 4,
-              border: "1px solid #ccc",
-              fontSize: 16,
-            }}
+            style={inputStyle}
             value={selectedKey}
             onChange={(e) => setSelectedKey(e.target.value)}
           >
@@ -264,33 +215,47 @@ export default function Admin() {
             onClick={apagarJogo}
             disabled={deleting || !selectedKey}
             style={{
+              ...buttonStyle,
               backgroundColor: deleting || !selectedKey ? "#ccc" : "#dc2626",
-              color: "white",
-              padding: "10px 16px",
-              border: "none",
-              borderRadius: 4,
               cursor: deleting || !selectedKey ? "not-allowed" : "pointer",
-              fontWeight: "600",
-              width: "100%",
             }}
           >
             {deleting ? "Apagando..." : "Apagar partida"}
           </button>
 
           {message && (
-            <p
-              style={{
-                marginTop: 16,
-                color: message.includes("sucesso") ? "green" : "red",
-                fontWeight: "600",
-                textAlign: "center",
-              }}
-            >
-              {message}
-            </p>
+            <p style={messageStyle(message)}>{message}</p>
           )}
         </div>
       )}
     </div>
   );
 }
+
+// Estilos reutilizáveis
+const inputStyle = {
+  width: "100%",
+  padding: 12,
+  marginBottom: 16,
+  borderRadius: 4,
+  border: "1px solid #ccc",
+  fontSize: 16,
+  boxSizing: "border-box",
+};
+
+const buttonStyle = {
+  width: "100%",
+  padding: 14,
+  color: "white",
+  fontWeight: "700",
+  border: "none",
+  borderRadius: 6,
+  fontSize: 16,
+};
+
+const messageStyle = (message) => ({
+  marginTop: 16,
+  color: message.includes("sucesso") ? "green" : "red",
+  fontWeight: "600",
+  textAlign: "center",
+});

@@ -70,7 +70,7 @@ export default function Artilharia() {
       }}
     >
       <h1 style={{ textAlign: "center", marginBottom: 32, color: "#1f2937" }}>
-        🥅 Artilharia & Jogos da Pelada
+        🥅 Artilharia | Treino de Quarta 2ªT
       </h1>
 
       {/* Ranking da artilharia */}

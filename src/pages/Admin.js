@@ -98,7 +98,7 @@ export default function Admin() {
       }}
     >
       <h1 style={{ textAlign: "center", marginBottom: 24 }}>
-        Admin - Pelada Artilharia
+        Admin - Artilharia 2ª Turma
       </h1>
 
       <div style={{ display: "flex", marginBottom: 24, cursor: "pointer" }}>
